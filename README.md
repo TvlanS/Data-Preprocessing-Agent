@@ -8,28 +8,10 @@ review gate for out-of-scope problems.
 
 ## Architecture - Plan
 
-```
-DatasetAuditor  →  audit_report.json
-                         │
-                         ▼
-              DeepSeek API (per column)
-                         │
-              ┌──────────┴──────────┐
-              │                     │
-         Standard ops         flag_for_review
-         (Deterministic)      (Non-Deterministic)
-              │                     │
-          Op Router            Review Gate ← Human Gate 1
-              │                     │
-         TOOLS dict           LLM/SLM writes tool
-              │                     │
-         df modified          Human Gate 2 (approve code)
-                                    │
-                              register to TOOLS
-                              persist to custom_tools.py
-                                    │
-                               df modified
-```
+<div align="center">
+  <img src="https://github.com/TvlanS/Data-Preprocessing-Agent/blob/b34c4ee42e54c35b40fc5e802caa953602d580ed/img/data_cleaning_agent_architecture.svg"width="700">
+  <br>
+</div>
 
 ---
 ## Progress
