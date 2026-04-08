@@ -1,0 +1,14 @@
+# Core
+pandas>=2.0
+numpy>=1.24
+openai>=1.0          # DeepSeek uses the OpenAI-compatible API
+
+# DatasetAuditor dependencies
+matplotlib>=3.7
+scipy>=1.11
+
+# Optional but recommended (DatasetAuditor uses these)
+rapidfuzz>=3.0        # fuzzy merge candidate detection
+scikit-learn>=1.3     # TF-IDF embedding similarity
+openpyxl>=3.1         # read .xlsx files
+pyarrow>=14.0         # read .parquet files
