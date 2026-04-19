@@ -1,5 +1,5 @@
 deepseek:
-  api_key: "sk-6493c5900c1144a48908eb57cfd29888"
+  api_key: "<your_api_key>"
   website_url: "https://api.deepseek.com"
 
 prompt:
