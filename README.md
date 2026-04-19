@@ -43,30 +43,6 @@ All outputs — cleaned datasets, profiling reports, outlier diagnostics, and ex
 
 ---
 
-## Data Preprocessing Pipeline
-
-```
-Tool 1 (Normalise)
-    │
-    ├──► Tool 2 (Numerical Outlier Analysis)  ──┐
-    └──► Tool 3 (Categorical Outlier Analysis) ─┤
-                                                 ▼
-                                           HITL Gate (Human Review)
-                                                 │
-                                    ┌────────────┤
-                                    │            │
-                               Tool 4            Tool 5
-                         (Remove Num Outliers) (Remove Cat Outliers)
-                                    └────────────┤
-                                                 ▼
-                                           Tool 6 (Impute Missing)
-                                                 │
-                                                 ▼
-                                            DataVault
-```
-
----
-
 ## Tools
 
 | Tool | File | Phase | Type | What It Does |
