@@ -1,0 +1,164 @@
+=======================================================
+MULTI-AGENT DATA CLEANING PIPELINE — ARCHITECTURE SPEC
+=======================================================
+
+OVERVIEW
+--------
+A multi-agent system for automated data cleaning and preprocessing.
+User queries are routed by a central orchestrator to specialised agents.
+Solid arrows = control flow (input). Dashed arrows = data flow (output).
+
+
+-------------------------------------------------------
+STORAGE LAYER
+-------------------------------------------------------
+Component : DataVault (Persistent Storage)
+Purpose   : Centralised storage shared across all agents
+Contents  :
+  - Log file       : Execution logs for all pipeline runs
+  - Boxplots       : Visual outlier diagnostics per column
+  - Datasets       : Raw and cleaned dataset versions
+  - Data profiling : Column-level statistics and metadata
+  - Outlier info   : Detected outlier records and scores
+Connections:
+  - Reads from / writes to : Data Preprocessing Agent (dashed)
+  - Reads from / writes to : Python Sandbox Agent (dashed)
+
+
+-------------------------------------------------------
+AGENT 0 — MANAGER (Orchestrator)
+-------------------------------------------------------
+Role        : Central orchestration manager
+Behaviour   : Receives user query, decides which agent(s)
+              to delegate the task to based on query intent
+Connections :
+  - Receives input from : User query (solid)
+  - Delegates to        : Data Preprocessing Agent (solid)
+  - Delegates to        : Python Sandbox Agent (solid)
+  - Receives results from : Data Preprocessing Agent (dashed)
+  - Receives results from : Python Sandbox Agent (dashed)
+
+
+-------------------------------------------------------
+AGENT 1 — DATA PREPROCESSING AGENT
+-------------------------------------------------------
+Role    : Cleans and preprocesses datasets using a combination
+          of deterministic tools and LLM-based analysis
+Type    : Deterministic + LLM tools
+
+Internal tool flow (sequential):
+
+  [Tool 1]
+  Name        : Tool 1
+  Description : Dataset normalising
+  Phase       : 1
+  Type        : Deterministic
+  Action      : Normalise column headers, remove duplicate rows
+                and empty rows/columns
+  Output      : Normalised dataset
+  Next        : Forks to Tool 2 AND Tool 3 (parallel)
+
+  [Tool 2]
+  Name        : Tool 2
+  Description : Numerical data outlier analysis
+  Phase       : 2A
+  Type        : LLM-based
+  Action      : Analyses numerical columns for statistical
+                outliers using LLM reasoning on data properties
+  Output      : Outlier report (numerical) → saved to DataVault
+  Next        : Merges with Tool 3 output → HITL Gate
+
+  [Tool 3]
+  Name        : Tool 3
+  Description : Categorical column outlier analysis
+  Phase       : 2B
+  Type        : LLM-based
+  Action      : Analyses categorical columns for anomalous
+                or rare values using LLM-based classification
+  Output      : Outlier report (categorical) → saved to DataVault
+  Next        : Merges with Tool 2 output → HITL Gate
+
+  [HITL Gate]
+  Name        : HITL Gate
+  Description : Human approval checkpoint
+  Type        : Human-in-the-loop
+  Action      : Human reviews outlier reports from Tool 2 and
+                Tool 3 and decides whether to proceed with removal
+  Output      : Approval signal (proceed / reject)
+  Next        : If approved, forks to Tool 4 AND Tool 5 (parallel)
+
+  [Tool 4]
+  Name        : Tool 4
+  Description : Removes outlier (Numerical)
+  Phase       : 3A
+  Type        : Deterministic
+  Action      : Removes or caps numerical outliers identified
+                in the Tool 2 analysis
+  Output      : Cleaned numerical columns
+  Next        : Merges with Tool 5 output → Tool 6
+
+  [Tool 5]
+  Name        : Tool 5
+  Description : Removes outlier (Categorical)
+  Phase       : 3B
+  Type        : Deterministic
+  Action      : Removes or replaces categorical outliers identified
+                in the Tool 3 analysis
+  Output      : Cleaned categorical columns
+  Next        : Merges with Tool 4 output → Tool 6
+
+  [Tool 6]
+  Name        : Tool 6
+  Description : Impute missing data
+  Phase       : 4
+  Type        : LLM / FancyImpute
+  Action      : Imputes remaining missing values using LLM-assisted
+                strategies or statistical methods (e.g. FancyImpute)
+  Output      : Fully cleaned dataset → saved to DataVault
+
+Agent Connections:
+  - Receives task from  : Manager (solid)
+  - Returns result to   : Manager (dashed)
+  - Writes outputs to   : DataVault (dashed)
+  - Reads data from     : DataVault (dashed)
+
+
+-------------------------------------------------------
+AGENT 2 — PYTHON SANDBOX AGENT
+-------------------------------------------------------
+Role        : Ad-hoc transformation and cleaning
+Type        : Python code execution sandbox
+Behaviour   : Executes custom Python scripts on request
+              from the Manager for tasks outside the standard
+              preprocessing pipeline
+Connections :
+  - Receives task from : Manager (solid)
+  - Returns result to  : Manager (dashed)
+  - Writes outputs to  : DataVault (dashed)
+  - Reads data from    : DataVault (dashed)
+
+
+-------------------------------------------------------
+ENTRY POINT
+-------------------------------------------------------
+Component : User query
+Action    : User submits a natural language query or data
+            cleaning request to the Manager
+
+
+-------------------------------------------------------
+PIPELINE EXECUTION FLOW SUMMARY
+-------------------------------------------------------
+1. User submits query
+2. Manager receives query and selects agent(s)
+3a. If standard cleaning → delegates to Data Preprocessing Agent
+      Tool 1 → (Tool 2 ∥ Tool 3) → HITL Gate
+      → (Tool 4 ∥ Tool 5) → Tool 6 → DataVault
+3b. If ad-hoc task → delegates to Python Sandbox Agent
+      Custom script → DataVault
+4. Results returned to Manager
+5. All outputs, logs, and diagnostics persisted in DataVault
+
+=======================================================
+END OF SPEC
+=======================================================

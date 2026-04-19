@@ -1,0 +1,119 @@
+deepseek:
+  api_key: "sk-6493c5900c1144a48908eb57cfd29888"
+  website_url: "https://api.deepseek.com"
+
+prompt:
+  categorical_cleaning_prompt2: |
+    Instructions:
+
+    Each of this cluster check and see if the strings can be merged , they maybe typos and different format which may make it look like it is different strings. The column is {0}, the dataset is about {1} merge acordingly based on the knowledge of the column and dataset. Only output the clusters that are mergeable. In your think analyse cluster by cluster .
+     Only merge strings if they are semantically identical AND do not contain differing structured tokens such as numbers (1,2,3…),ordered labels (A,B,C…), IDs, codes, or levels. Stritctly dont merge comma separated strings , if they vary as it could indicate a list of different values.
+
+    Return only the json for mergeable as following (example): 
+    
+    Input : 
+    Cluster 3 : ["dog and a cat collection", "cats & dogs collection", "pet pals - collection", "pets collection", "wolf and snake collection"]
+
+    Output:
+    {"mergable_clusters": {
+        "Cluster 3": {
+          "original_strings": ["dog and a cat collection", "cats & dogs collection", "pet pals - collection", "pets collection"],
+          "merged_to": "cats & dogs / pets collection"
+        },}
+
+  system_prompt: |
+    You are a datacleaning agent for machine learning modelling,Return your answer as a valid JSON object..
+
+
+    CRITICAL RULE (HIGHEST PRIORITY):
+  
+  categorical_cleaning_prompt1: |
+      For of the cluster below check and see if the strings in the list can be combined so that there are no duplicates that are similar, the duplicates may have typos, different format or synonymn which may make it look like it is different strings. The column is {0}, the dataset is about {1} , based on the knowledge of the dataset try to find the duplicates. Only output the clusters that are mergeable. In your think analyse cluster by cluster . Return only the json for mergeable as following (example): 
+      Input : 
+      Cluster 3 : ["dog and a cat collection", "cats & dogs collection", "pet pals - collection", "pets collection", "wolf and snake collection"] ---> this is a full list
+
+      Output:
+      {"mergable_clusters": {
+          "Cluster 3": {
+            "original_strings": ["dog and a cat collection", "cats & dogs collection", "pet pals - collection", "pets collection"], ---> This is the list to be merged only
+            "merged_to": "cats & dogs / pets collection"
+          },}
+
+
+        For each cluster below, identify which strings are TRUE duplicates — meaning they represent exactly the same set of items, just written differently (typos, different separators like "|" vs "," vs "and", word order, abbreviations, synonyms).
+  categorical_cleaning_prompt3: |
+      DO NOT merge strings that represent different sets (e.g., "X" alone vs "X, Y" vs "Y alone" vs "X, Z"). These are semantically different and must remain separate for the model to preserve meaning.
+
+      Rules for mergeable:
+      - Same items, different separators: "X|Y" and "X, Y" → merge
+      - Same items, different order: "X, Y" and "Y, X" → merge
+      - Typos: "albania" vs "albaniaa" → merge
+      - Synonyms only if identical meaning: "USA" vs "United States" → merge
+      - Abbreviations: "US" vs "United States" → merge
+
+      Rules for NOT mergeable:
+      - Different number of items: "X" vs "X, Y" → do NOT merge
+      - Different combinations: "X, Y" vs "X, Z" → do NOT merge
+      - Subsets: "X" vs "X, Y" → do NOT merge
+
+      Output only clusters that have mergeable strings. For each such cluster, list ONLY the strings that are true duplicates (not the whole cluster if some are different).
+
+      Example input:
+      Cluster A: ["usa", "united states", "usa, canada", "canada"]
+
+      Output:
+      {"mergable_clusters": {
+        "Cluster A": {
+          "original_strings": ["usa", "united states"],
+          "merged_to": "united states"
+        }
+      }}
+
+      Note: "usa, canada" and "canada" are NOT merged because they represent different sets.
+
+
+      You are a data cleaning assistant. Your job is to find strings inside each cluster that mean exactly the same thing and should be merged into one.
+
+
+  categorical_cleaning_prompt: |
+
+    STEP 1 — Normalize every string before comparing
+
+    Before comparing any two strings, apply these rules mentally:
+
+    Separators are interchangeable. Treat , and | and / as the same separator. So "english, welsh" = "english|welsh" = "english/welsh"
+
+    Order does not matter. A list of the same items in a different order is the same string. So "english|welsh" = "welsh|english"
+
+    Ignore spacing around separators. So "english | welsh" = "english|welsh"
+
+    Ignore letter case. So "English" = "english"
+
+    STEP 2 — Only merge if the items are identical after normalization
+
+    Two strings are mergeable only if after applying Step 1, they contain the exact same items.
+
+    Do not merge if one string has more items than the other. For example "english" is not the same as "english, welsh" because one has 2 languages and the other has 1.
+
+    Do not merge strings that are merely related or similar in topic. They must be identical in content.
+
+    Do not merge strings with different numbers, codes, IDs, or ordered labels. For example "level 1" is not the same as "level 2".
+
+    Do not generalize a few specific strings into one broader or vaguer label.
+
+    STEP 3 — Output only clusters that have at least one mergeable pair
+
+    For each mergeable group within a cluster, list the original_strings which are the strings being merged, and merged_to which is the single clean canonical form to replace them with using a comma and space as the separator in alphabetical order.
+
+    Strings within a cluster that are not mergeable with anything should be left out of the output entirely.
+
+    Example
+
+    Input:
+    cluster_A: ["english|welsh", "welsh, english", "welsh", "french"]
+
+    Reasoning:
+    "english|welsh" and "welsh, english" have the same two items with just a different separator and order so they should be merged. "welsh" has only 1 item which is different from the 2 item strings so do not merge. "french" is completely different so do not merge.
+
+    Output:
+    {"mergeable_clusters": {"cluster_A": {"original_strings": ["english|welsh", "welsh, english"], "merged_to": "english, welsh"}}}
