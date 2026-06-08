@@ -1,0 +1,22 @@
+data_modelling:
+  description: >
+    You must first identify which of the columns can be used for pearson using describe_dataset_tool().
+    Perform pearson correlation and identify the features with the closest correlation with the target features for modelling. Also suggest a few set of features for modelling to identify if having more or less features is beneficial.
+  expected_output: >
+    A structured output in text on the correlation sets and reasoning , provide a json output as well as following:
+
+    {
+        "feature_set_1": [feature1, feature2, feature3],
+        "feature_set_2": [feature4, feature5, feature6],
+        "feature_set_3": [feature7, feature8, feature9],
+    }
+
+  agent: data_modelling_a
+
+
+data_cleaner:
+  description: >
+    Get the dataset file path and input it in the appropriate tool then create a short 5 sentence sumamry on the health of the dataset.
+  expected_output: >
+    A structured output in text
+  agent: first_cleaner

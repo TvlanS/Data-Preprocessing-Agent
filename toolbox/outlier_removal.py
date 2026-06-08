@@ -324,7 +324,7 @@ class OutlierRemovalPipeline:
 
 
 # ── Run ───────────────────────────────────────────────────────────────────────
-path_yaml = rf"C:\Users\tvlan\Documents\Data Mining\1.0 Assignment\1.0 Python\reference\tb_col.yaml"
+path_yaml = rf"C:\Users\tvlan\Documents\1.0 Python\5.0 Automated Cleaning Agent\reference\tb_col.yaml"
 path_csv  = rf"C:\Users\tvlan\Documents\Data Mining\1.0 Assignment\1.0 Python\Data\tb_syth_data_basic_v4.csv"
 
 with open(path_yaml, "r", encoding="utf-8") as f:

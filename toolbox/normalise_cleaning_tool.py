@@ -277,6 +277,7 @@ class DataCleaningTool:
             progress_bar=False,
         )
         profile.to_file(out_dir / "report.html")
+        profile.to_file(out_dir / "report_json.json")
 
         desc  = profile.get_description()
         table = desc.table
@@ -641,7 +642,7 @@ class DataCleaningTool:
 if __name__ == "__main__":
 
     # ── Configuration ─────────────────────────────────────────────────────────
-    DATASET_PATH      = r"C:\Users\tvlan\Documents\1.0 Python\1.0 Data Cleaning Agent\UMMC_TB_registry_2018_2024.xlsx"
+    DATASET_PATH      = r"C:\Users\tvlan\Documents\Data Mining\1.0 Assignment\1.0 Python\Data\tb_syth_data_basic_V5.csv"
     ROW_THRESHOLD     = 70.0   # Drop rows  with > 70 % empty cells
     COL_THRESHOLD     = 70.0   # Drop columns with > 70 % empty cells
     MINIMAL_PROFILING = False  # True = faster scan, skips correlation analysis

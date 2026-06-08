@@ -234,7 +234,7 @@ class SymptomClassifier:
 # ======================================================================
 if __name__ == "__main__":
     CSV_PATH  = r"C:\Users\tvlan\Documents\Data Mining\1.0 Assignment\1.0 Python\Data\outlier_run_20260426_151523\impute_run_20260426_175754\impute_outlier_tb_syth_data_basic_v4_20260426_151523_20260426_175754.csv"
-    YAML_PATH = r"C:\Users\tvlan\Documents\Data Mining\1.0 Assignment\1.0 Python\reference\tb_col.yaml"
+    YAML_PATH = r"C:\Users\tvlan\Documents\1.0 Python\5.0 Automated Cleaning Agent\reference\tb_col.yaml"
 
     classifier = SymptomClassifier(
         csv_path  = CSV_PATH,
