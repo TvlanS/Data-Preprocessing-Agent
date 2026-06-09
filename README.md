@@ -6,7 +6,7 @@ Built with **CrewAI** for agent orchestration, **ydata-profiling** for before/af
 
 > **Work in progress** — pipeline is actively being developed.
 
-> **Other Completed Agent Project** — [YouTube Knowledge RAG Agent](https://github.com/TvlanS/Youtube-Knowledge-RAG-Agent) [Machine Learning Agent](https://github.com/TvlanS/Machine-Learning-Agent)
+> **Other Completed Agent Project** — [YouTube Knowledge RAG Agent](https://github.com/TvlanS/Youtube-Knowledge-RAG-Agent) , [Machine Learning Agent](https://github.com/TvlanS/Machine-Learning-Agent)
 
 ---
 
